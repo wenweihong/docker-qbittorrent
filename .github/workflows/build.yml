@@ -1,0 +1,31 @@
+name: Build qbittorrent x86 Image
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build x86 Image
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t qbittorrent:latest \
+            --output type=docker \
+            .
+
+      - name: Save Image
+        run: docker save qbittorrent:latest -o qbittorrent-amd64.tar
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: qbittorrent-amd64
+          path: qbittorrent-amd64.tar
